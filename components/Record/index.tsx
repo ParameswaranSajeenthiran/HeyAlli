@@ -98,6 +98,7 @@ class Record extends Component<Props, State> {
     console.log("onSpeechPartialResults: ", e);
     this.setState({
       partialResults: e.value!,
+      results:e.value!
     });
   };
 
@@ -202,7 +203,7 @@ class Record extends Component<Props, State> {
             </View>
           </TouchableHighlight>
         ) : (
-          <TouchableHighlight onLongPress={this._startRecognizing}>
+          <TouchableHighlight onPress={this._startRecognizing}>
             <View
               style={{
                 width: 75,

@@ -7,14 +7,77 @@ import {
   Button,
   Pressable,
 } from "react-native";
+import { getAuth, signOut } from "firebase/auth";
+
 import { useMutation, useQueryClient } from "react-query";
 import useCreateNote from "../../hooks/useCreateNote";
 import Record from "../Record";
-
+import * as Speech from 'expo-speech';
+import { Audio } from 'expo-av';
+import axios from "axios";
 export default function Home() {
   const [speechText, setSpeechText] = useState("");
+  const [waveUrl, setWaveUrl] = useState("");
+
   const { mutate, isError, isLoading, isSuccess } = useCreateNote();
   const queryClient = useQueryClient();
+  const speak = () => {
+    const thingToSay = speechText;
+    Speech.speak(thingToSay);
+  };
+   
+
+   const [sound, setSound] = useState();
+function getWave(text){
+  axios.post("https://voice.dev.bhuman.ai/api/voice/clip", {
+    "text": text,
+    "voice_id": "405b58e3"
+  }).then((res)=>{
+console.log(res.data.result.url)
+setWaveUrl(res.data.result.url)
+playSound(res.data.result.url)
+
+  });
+
+
+}
+
+ function logOut(){
+  
+const auth = getAuth();
+signOut(auth).then((res) => {
+  // Sign-out successful.
+  console.log(res,"signou")
+}).catch((error) => {
+  // An error happened.
+});
+ }
+  async function playSound(url) {
+   
+   
+  ;
+
+
+    console.log('Loading Sound');
+    const { sound } = await Audio.Sound.createAsync( {uri: url})
+    ;
+    setSound(sound);
+
+    console.log('Playing Sound');
+    console.log(new Date())
+
+    await sound.playAsync();
+  }
+
+ useEffect(() => {
+    return sound
+      ? () => {
+
+          console.log('Unloading Sound');
+          sound.unloadAsync();
+        }
+      : undefined;
+  }, [sound]);
 
   useEffect(() => {
     if (isSuccess) {
@@ -26,7 +89,7 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <View style={styles.inputContainer}>
-        <Text style={styles.label}>Speech Text</Text>
+        <Text style={styles.label}>Output</Text>
         <TextInput
           multiline
           style={styles.textInput}
@@ -58,10 +121,10 @@ export default function Home() {
           />
 
           <Button
-            title="Clear"
+            title="logOut"
             color={"#007AFF"}
             onPress={() => {
-              setSpeechText("");
+              logOut();
             }}
           />
         </View>
@@ -70,13 +133,20 @@ export default function Home() {
       <View style={styles.voiceContainer}>
         <Record
           onSpeechEnd={(value) => {
+console.log(new Date())
             setSpeechText(value[0]);
+            getWave(value[0])
+
+
           }}
           onSpeechStart={() => {
             setSpeechText("");
           }}
         />
       </View>
+      <View >
+      {/* <Button title="Press to hear " onPress={playSound)} /> */}
+    </View>
     </View>
   );
 }
