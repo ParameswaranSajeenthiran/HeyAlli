@@ -16,22 +16,51 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 
 import Loader from './Loader';
 import logo from './Images/heyAlliTitle.jpg'
+import logoBack from './Images/logoback.png'
+import signInButton from './Images/signIn.jpg'
+import { LinearGradient } from 'expo-linear-gradient';
+import facebook from './Images/facebook.png'
+import google from './Images/google.webp'
+import apple from './Images/apple.png'
+import * as WebBrowser from 'expo-web-browser';
+import * as Google from 'expo-auth-session/providers/google';
 import {  MaterialIcons } from '@expo/vector-icons';
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
-import { getAuth, signInWithEmailAndPassword } from 'firebase/auth';
-import { Feather } from '@expo/vector-icons'; 
+import { getAuth, signInWithEmailAndPassword,GoogleAuthProvider, signInWithPopup, signInWithRedirect } from 'firebase/auth';
+import { Feather } from '@expo/vector-icons';
+
+
 
 const LoginScreen = ({navigation}) => {
+  WebBrowser.maybeCompleteAuthSession();
+
+  const [request, response, promptAsync] = Google.useAuthRequest({
+    expoClientId: '44373533249-4eatu4snl2fhth2cqc7sf848fh19sqvk.apps.googleusercontent.com',
+    androidClientId:'44373533249-k414100f72pkrcrm4s9i0p3kinm9s3q0.apps.googleusercontent.com'
+  
+  });
+
+  React.useEffect(() => {
+    if (response?.type === 'success') {
+      const { authentication } = response;
+    }
+  }, [response]);
+
+
+  
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
   const [loading, setLoading] = useState(false);
   const [errortext, setErrortext] = useState('');
   const [showPassword,setShowPassword]=useState(false);
-
+  const auth = getAuth();
+  const provider = new GoogleAuthProvider();
   const passwordInputRef = createRef();
 function loginUser(){
-  const auth = getAuth();
   console.log("login test")
+
+
+
 
 
   setLoading(true)
@@ -53,6 +82,48 @@ signInWithEmailAndPassword(auth,  userEmail,userPassword)
     alert(error)
   });
 }
+
+
+function loginUserWithGoogle(){
+ 
+
+  console.log("login test")
+
+
+  
+
+
+  setLoading(true)
+  // const auth = getAuth();
+
+  signInWithPopup(auth, provider)
+    .then((result) => {
+      // This gives you a Google Access Token. You can use it to access the Google API.
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      const token = credential.accessToken;
+      // The signed-in user info.
+      const user = result.user;
+
+      // onst user = userCredential.user;
+    navigation.navigate("home")
+    console.log(user)
+    setLoading(false)
+      // IdP data available using getAdditionalUserInfo(result)
+      // ...
+    }).catch((error) => {
+      // Handle Errors here.
+      const errorCode = error.code;
+      const errorMessage = error.message;
+      // The email of the user's account used.
+      const email = error.customData.email;
+      // The AuthCredential type that was used.
+      const credential = GoogleAuthProvider.credentialFromError(error);
+      // ...
+    });
+
+
+}
+
   const handleSubmitPress = () => {
     setErrortext('');
     if (!userEmail) {
@@ -105,31 +176,22 @@ signInWithEmailAndPassword(auth,  userEmail,userPassword)
   };
 
   return (
-    <View style={styles.mainBody}>
-      <View style={{alignSelf:'flex-end',width:100,height:100,backgroundColor:'#4d97f0',borderBottomLeftRadius:100}}/>
-      <Loader loading={loading} />
+    <View style={{flex: 1, backgroundColor: 'white'}}>
+      <Loader loading={loading} /> 
+
       <ScrollView
+      nestedScrollEnabled={true}
         keyboardShouldPersistTaps="handled"
         contentContainerStyle={{
-          flex: 1,
           justifyContent: 'center',
           alignContent: 'center',
-          marginTop:10
-        }}>
+        }}>  
         <View>
           <KeyboardAvoidingView enabled>
-            <View style={{alignItems: 'center'}}>
-              <Image
-                source={logo}
-                style={{
-                  width: '100%',
-                  height: "50%",
-                  resizeMode: 'contain',
-                  margin: 30,
-                }}
-              />
-            </View>
-            <View style={styles.SectionStyle}>
+          <View>
+  <Image style={{width:'100%'}} source={logoBack}/>
+</View>
+            <View  style={{...styles.SectionStyle,marginTop:150}}>
             <MaterialIcons name="email" style={{top:8}} size={24} color="black" />
 
               <TextInput
@@ -177,21 +239,53 @@ signInWithEmailAndPassword(auth,  userEmail,userPassword)
                 {errortext}
               </Text>
             ) : null}
-            <TouchableOpacity
-              style={styles.buttonStyle}
-              activeOpacity={0.5}
-              onPress={()=>{
+          <TouchableOpacity
+style={{justifyContent:'center',flex:1,alignItems:'center',marginVertical:10}}
+            activeOpacity={0.5}
+            onPress={()=>{
+                // props.navigation.navigate("home")
                 loginUser()
-              }}>
-              <Text style={styles.buttonTextStyle}>LOGIN</Text>
-            </TouchableOpacity>
+                
+
+                
+            }}>
+<Image style={{borderRadius:10,marginVertical:10}}  source={signInButton}>
+
+
+
+</Image>
+          
+            {/* <Text style={styles.buttonTextStyle}>Create Account</Text> */}
+          </TouchableOpacity>
+          <View style={{flex:1,flexDirection:'row',marginTop:10,marginHorizontal:100}}>
+          <View >
+            <Image style={styles.socialMediaIcon} source={facebook}/>
+          </View>
+
+<TouchableOpacity onPress={()=>promptAsync()}>
+          <View >
+            <Image style={styles.socialMediaIcon} source={google}/>
+          </View>
+
+          </TouchableOpacity>
+          <View>
+            <Image style={styles.socialMediaIcon} source={apple}/>
+          </View>
+
+
+        </View>
             <Text
               style={styles.registerTextStyle}
               onPress={() => navigation.navigate('signUp')}>
               Don't have a Account  ? <Text style={{color:'#4d97f0'}}>Sign Up</Text>
             </Text>
+
+
           </KeyboardAvoidingView>
+
+
         </View>
+       
       </ScrollView>
     </View>
   );
@@ -255,4 +349,9 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     fontSize: 14,
   },
+  socialMediaIcon:{
+    height:50,
+    width:50,
+    borderWidth:2,marginHorizontal:10,borderRadius:10,borderColor:'grey'
+  }
 });

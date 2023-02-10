@@ -8,12 +8,13 @@ import {
   View,
   StyleSheet,
   Image,
-  Text
+  Text,
+  ImageBackground
 } from 'react-native';
 
 // import AsyncStorage from '@react-native-community/async-storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import logo from './Images/heyAllilogo.jpg'
+import logo from './Images/splashScreen.png'
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 const SplashScreen = ({navigation}) => {
   //State for ActivityIndicator animation
@@ -68,20 +69,23 @@ onAuthStateChanged(auth, (user) => {
   }, []);
 
   return (
-    <View style={styles.container}>
-      <Image
+    <View style={{height:'100%'}}>
+      <ImageBackground
         source={logo}
-        style={{ borderRadius:100,width:100,height:100}}
-      />
-      <Text style={{marginTop:30,fontSize:40,fontWeight:'bold',color:'white',fontFamily:'san'}}>Hey Alli</Text>
-      <Text style={{marginTop:30,fontSize:20,color:'white'}}>THE WORLD'S MOST POWERFULL AI</Text>
-
-      <ActivityIndicator
+        style={{ width:"100%",height:'100%'}}
+      >
+ <ActivityIndicator
         animating={animating}
         color="#FFFFFF"
         size="large"
         style={styles.activityIndicator}
       />
+
+      </ImageBackground>
+      {/* <Text style={{marginTop:30,fontSize:40,fontWeight:'bold',color:'white',fontFamily:'san'}}>Hey Alli</Text>
+      <Text style={{marginTop:30,fontSize:20,color:'white'}}>THE WORLD'S MOST POWERFULL AI</Text> */}
+
+     
     </View>
   );
 };
@@ -92,8 +96,7 @@ const styles = StyleSheet.create({
   container: {
     flex: 1,
     alignItems: 'center',
-    justifyContent: 'center',
-    backgroundColor: '#569ffb',
+    justifyContent: 'center'
   },
   activityIndicator: {
     alignItems: 'center',

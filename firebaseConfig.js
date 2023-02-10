@@ -1,6 +1,7 @@
 // Import the functions you need from the SDKs you need
 import { initializeApp } from "firebase/app";
-import { getAuth } from "firebase/auth";
+import { getAuth, signInWithPopup, GoogleAuthProvider } from "firebase/auth";
+
 // import { collection, getFirestore } from "firebase/firestore";
 import firebase from 'firebase/compat/app'
 import { getFirestore, collection, getDocs, addDoc } from 'firebase/firestore/lite';
@@ -42,6 +43,9 @@ export async function createUser(data,dbCollection){
   }
 }
 
+
+
+// https://heyalli-39ff3.firebaseapp.com/__/auth/handler
 
 
 export default getCities

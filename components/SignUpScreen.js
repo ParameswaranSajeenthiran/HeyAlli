@@ -13,21 +13,28 @@ import {
   Keyboard,
   TouchableOpacity,
   ScrollView,
+  ImageBackground,
 } from 'react-native';
 import DropDownPicker from 'react-native-dropdown-picker';
-import { AntDesign } from '@expo/vector-icons'; 
+import { AntDesign, Feather } from '@expo/vector-icons'; 
 import { addDoc, collection, getFirestore } from "firebase/firestore";
 import countryList from './countryList'
 // import DropDownPicker from "react-native-dropdown-picker";
 import Loader from './Loader';
-import logo from './Images/heyAlliTitle.jpg'
-import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import logo from './Images/logo.png'
+import { getAuth, createUserWithEmailAndPassword, parseActionCodeURL } from "firebase/auth";
 import { FontAwesome } from '@expo/vector-icons'; 
 import { MaterialCommunityIcons } from '@expo/vector-icons'; 
 import app, {auth, createUser} from '../firebaseConfig'
 import { MaterialIcons } from '@expo/vector-icons'; 
 import { async } from '@firebase/util';
 import getCities from '../firebaseConfig';
+import logoBack from './Images/logoback.png'
+import { LinearGradient } from 'expo-linear-gradient';
+import facebook from './Images/facebook.png'
+import google from './Images/google.webp'
+import apple from './Images/apple.png'
+import button from './Images/signUpButton.png'
 // import db from '../firebaseConfig';
 const RegisterScreen = (props) => {
   const [userName, setUserName] = useState('');
@@ -44,25 +51,61 @@ const RegisterScreen = (props) => {
   const [companyOpen, setCompanyOpen] = useState(false);
   const [companyValue, setCompanyValue] = useState(null);
   const [country, setCountry] = useState(countryList);
+  const [showPassword,setShowPassword]=useState(false);
+
   const [
     isRegistraionSuccess,
     setIsRegistraionSuccess
   ] = useState(false);
   const auth = getAuth();
   const handleSignUp = async () => {
-    setLoading(true);
 
 
        createUserWithEmailAndPassword( auth,userEmail, userPassword)
       .then(async userCredentials => {
         const user = userCredentials.user;
-        handleSubmitButton(user.uid)
+        createUser({
+          uid:user.uid,
+          userEmail:userEmail,
+          userName:userName,
+          userAge:userAge,
+          userMobileNumber:userMobileNumber,
+          userCountry:userCountry,
+          zipCode:zipCode
+    
+        },"users")
+          .then((responseJson) => {
+            //Hide Loader
+            setLoading(false);
+            console.log(responseJson);
+    
+            // If server response message same as Data Matched
+            // if (responseJson.status === 'success') {
+            //   setIsRegistraionSuccess(true);
+            //   console.log(
+            //     'Registration Successful. Please Login to proceed'
+            //   );
+            // } else {
+            //   setErrortext(responseJson.msg);
+            // }
+            props.navigation.navigate("home")
+          })
+          .catch((error) => {
+            //Hide Loader
+            setLoading(false);
+            console.error(error);
+          });
+        // handleSubmitButton(user.uid)
+        
 
  
         
         console.log('Registered with:', user.email);
       })
-      .catch(error => alert(error.message))
+      .catch(error =>{
+        
+        
+        alert(error.message)})
   }
 
 
@@ -76,7 +119,7 @@ const RegisterScreen = (props) => {
   const onCompanyOpen = useCallback(() => {
     setCompanyOpen(false);
   }, []);
-  const handleSubmitButton = (uid) => {
+  const handleSubmitButton = () => {
     setErrortext('');
     if (!userName) {
       alert('Please fill Name');
@@ -86,56 +129,25 @@ const RegisterScreen = (props) => {
       alert('Please fill Email');
       return;
     }
-    if (!userAge) {
-      alert('Please fill Age');
-      return;
-    }
-    if (!userCountry) {
-      alert('Please fill country');
-      return;
-    }
-    if (!userPassword) {
-      alert('Please fill Password');
-      return;
-    }
-    if (!userMobileNumber) {
-      alert('Please fill Mobile');
-      return;
-    }
+    // if (!userAge) {
+    //   alert('Please fill Age');
+    //   return;
+    // }
+    // if (!userCountry) {
+    //   alert('Please fill country');
+    //   return;
+    // }
+    // if (!userPassword) {
+    //   alert('Please fill Password');
+    //   return;
+    // }
+    // if (!userMobileNumber) {
+    //   alert('Please fill Mobile');
+    //   return;
+    // }
     
-    //Show Loader
-
-    createUser({
-      uid:uid,
-      userEmail:userEmail,
-      userName:userName,
-      userAge:userAge,
-      userMobileNumber:userMobileNumber,
-      userCountry:userCountry,
-      zipCode:zipCode
-
-    },"users")
-      .then((responseJson) => {
-        //Hide Loader
-        setLoading(false);
-        console.log(responseJson);
-
-        // If server response message same as Data Matched
-        // if (responseJson.status === 'success') {
-        //   setIsRegistraionSuccess(true);
-        //   console.log(
-        //     'Registration Successful. Please Login to proceed'
-        //   );
-        // } else {
-        //   setErrortext(responseJson.msg);
-        // }
-        props.navigation.navigate("home")
-      })
-      .catch((error) => {
-        //Hide Loader
-        setLoading(false);
-        console.error(error);
-      });
+handleSignUp()
+    
   };
   if (isRegistraionSuccess) {
     return (
@@ -176,10 +188,12 @@ const RegisterScreen = (props) => {
           justifyContent: 'center',
           alignContent: 'center',
         }}>      
-        <View style={{alignSelf:'flex-start',width:60,height:60,backgroundColor:'#4d97f0',borderBottomRightRadius:200}}/>
-
-        <View style={{alignItems: 'center',marginTop:-40}}>
-          <Image
+        {/* <View style={{alignSelf:'flex-start',width:60,height:60,backgroundColor:'#4d97f0',borderBottomRightRadius:200}}/> */}
+<View>
+  <Image style={{width:'100%'}} source={logoBack}/>
+</View>
+        <View style={{alignItems: 'center',marginTop:8,borderTopEndRadius:50}}>
+          {/* <Image
             source={logo}
             style={{
               width:1000,
@@ -187,7 +201,7 @@ const RegisterScreen = (props) => {
               resizeMode: 'contain',
               margin: 0,
             }}
-          />
+          /> */}
         </View>
         <KeyboardAvoidingView enabled>
           <View style={styles.SectionStyle}>
@@ -245,15 +259,17 @@ const RegisterScreen = (props) => {
               placeholderTextColor="#8b9cb5"
               ref={passwordInputRef}
               returnKeyType="next"
-              secureTextEntry={true}
+              secureTextEntry={!showPassword}
               onSubmitEditing={() =>
                 ageInputRef.current &&
                 ageInputRef.current.focus()
               }
               blurOnSubmit={false}
             />
+                          <Feather name={showPassword? "eye":"eye-off"} style={{top:6}} size={24} color="black"  onPress={()=>setShowPassword(!showPassword)}/>
+
           </View>
-          <View style={styles.SectionStyle}>
+          {/* <View style={styles.SectionStyle}>
           <View> 
           <FontAwesome name="user" size={24} style={{top:8}} color="black" />
            </View>
@@ -330,7 +346,7 @@ const RegisterScreen = (props) => {
                zIndex={1000}
               zIndexInverse={3000}
             />
-          </View>
+          </View> */}
           
          
           
@@ -341,24 +357,41 @@ const RegisterScreen = (props) => {
               {errortext}
             </Text>
           ) : null}
-          <TouchableOpacity
-            style={styles.buttonStyle}
+
+<TouchableOpacity
+style={{justifyContent:'center',flex:1,alignItems:'center'}}
             activeOpacity={0.5}
             onPress={()=>{
                 // props.navigation.navigate("home")
-                handleSignUp()
+                handleSubmitButton()
                 
 
                 
             }}>
-            <Text style={styles.buttonTextStyle}>REGISTER</Text>
+<Image style={{borderRadius:10,marginVertical:30}}  source={button}/>
+          
+            {/* <Text style={styles.buttonTextStyle}>Create Account</Text> */}
           </TouchableOpacity>
+          <View style={{flex:1,flexDirection:'row',marginTop:10,marginHorizontal:100}}>
+          <View >
+            <Image style={styles.socialMediaIcon} source={facebook}/>
+          </View>
+          <View>
+            <Image style={styles.socialMediaIcon} source={google}/>
+          </View>
+          <View>
+            <Image style={styles.socialMediaIcon} source={apple}/>
+          </View>
+
+
+        </View>
           <Text
               style={styles.registerTextStyle}
               onPress={() =>props.navigation.navigate('login')}>
               Already Have an account   ? <Text style={{color:'#4d97f0'}}>Sign In</Text>
             </Text>
         </KeyboardAvoidingView>
+        
       </ScrollView>
     </View>
   );
@@ -395,13 +428,14 @@ const styles = StyleSheet.create({
     borderWidth: 0,
     color: '#FFFFFF',
     borderColor: '#7DE24E',
-    height: 40,
+    height: 60,
     alignItems: 'center',
     borderRadius: 30,
     marginLeft: 35,
     marginRight: 35,
     marginTop: 20,
     marginBottom: 20,
+  
   },
   buttonTextStyle: {
     color: '#FFFFFF',
@@ -446,5 +480,10 @@ const styles = StyleSheet.create({
   },
   placeholderStyles:{
     height:20
+  },
+  socialMediaIcon:{
+    height:50,
+    width:50,
+    borderWidth:2,marginHorizontal:10,borderRadius:10,borderColor:'grey'
   }
 });

@@ -14,6 +14,7 @@ import LoginScreen from "./components/LoginScreen";
 import SignUpScreen from "./components/SignUpScreen";
 import SplashScreen from "./components/SplashScreen";
 import { getAuth, createUserWithEmailAndPassword } from "firebase/auth";
+import Whisper from "./components/Whisper";
 
 const Tab = createBottomTabNavigator();
 const Stack=createNativeStackNavigator()
@@ -31,7 +32,7 @@ export default function App() {
             backgroundColor: '#307ecc',
           }}}  name="splashScreen" component={SplashScreen} />
 
-        <Stack.Screen  name="home" component={HomeScreen} />
+        <Stack.Screen  name="home" component={Whisper} />
         <Stack.Screen options={{title:"",headerStyle: {
             backgroundColor: '#307ecc',
           },

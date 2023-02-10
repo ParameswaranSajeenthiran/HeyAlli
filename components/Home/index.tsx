@@ -9,7 +9,7 @@ import {
 } from "react-native";
 import { getAuth, signOut } from "firebase/auth";
 
-import { useMutation, useQueryClient } from "react-query";
+// import { useMutation, useQueryClient } from "react-query";
 import useCreateNote from "../../hooks/useCreateNote";
 import Record from "../Record";
 import * as Speech from 'expo-speech';
@@ -19,8 +19,8 @@ export default function Home() {
   const [speechText, setSpeechText] = useState("");
   const [waveUrl, setWaveUrl] = useState("");
 
-  const { mutate, isError, isLoading, isSuccess } = useCreateNote();
-  const queryClient = useQueryClient();
+  // const { mutate, isError, isLoading, isSuccess } = useCreateNote();
+  // const queryClient = useQueryClient();
   const speak = () => {
     const thingToSay = speechText;
     Speech.speak(thingToSay);
@@ -80,11 +80,12 @@ signOut(auth).then((res) => {
   }, [sound]);
 
   useEffect(() => {
-    if (isSuccess) {
+    // if (isSuccess) {
       setSpeechText("");
-      queryClient.invalidateQueries(["notes"]);
-    }
-  }, [isSuccess]);
+      // queryClient.invalidateQueries(["notes"]);
+    // }
+  // }, [isSuccess]);
+},[])
 
   return (
     <View style={styles.container}>
@@ -113,7 +114,7 @@ signOut(auth).then((res) => {
             onPress={async () => {
               console.log("save");
               try {
-                await mutate(speechText);
+                // await mutate(speechText);
               } catch (e) {
                 console.log(e);
               }
